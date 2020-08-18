@@ -23,6 +23,29 @@ export function reqGetSecSubject(parentId) {
   });
 }
 
+// 添加分类课程 请求路径：http://localhost:5000/admin/edu/subject/save 请求方式：POST
+export function reqAddSubjectList(title,parentId) {
+  return request({
+    url: `${BASE_URL}/save`,
+    method: 'POST',
+    data:{
+        title,
+        parentId
+    }
+  });
+}
+
+// 更新课程分类 请求路径 http://localhost:5000/admin/edu/subject/update  请求方式：PUT
+export function reqUpdateSubject(id,title) {
+  return request({
+    url: `${BASE_URL}/update`,
+    method: 'PUT',
+    data:{
+        id,
+        title        
+    }
+  });
+}
 
 
 

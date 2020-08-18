@@ -1,33 +1,14 @@
 import React, { Component } from "react";
-import { Button,Table,Tooltip } from 'antd';
+import { Button,Table,Tooltip, Input, message } from 'antd';
 import { PlusOutlined ,FormOutlined, DeleteOutlined} from '@ant-design/icons';
 import './index.less'
 import {connect} from 'react-redux'
-import {getSubjectList,getSecSubjectList} from './redux/actions'
+import {getSubjectList,getSecSubjectList,updateSubjectList} from './redux/actions'
+import {reqUpdateSubject} from '@api/edu/subject'
 
 
 
 
-const columns = [
-  { title: '分类名称', dataIndex: 'title', key: 'name' },
- 
-  {
-    title: '操作',
-    dataIndex: '',
-    key: 'action',
-    render: () => (<>
-      <Tooltip placement="top" title={'更新课程'}>
-          <Button icon={<FormOutlined />} type='primary' style={{marginRight:20,width:40}}></Button>
-      </Tooltip>
-       
-      <Tooltip placement="top" title={'删除课程'}>
-          <Button icon={<DeleteOutlined />} type='danger' style={{width:40}}></Button>
-      </Tooltip>
-       
-    </>),
-    width:200,
-  },
-];
 
 const data = [
   {
@@ -60,8 +41,14 @@ const data = [
   },
 ];
 
-@connect(state =>({subjectList:state.subjectList}),{getSubjectList,getSecSubjectList})
+@connect(state =>({subjectList:state.subjectList}),{getSubjectList,getSecSubjectList,updateSubjectList})
  class Subject extends Component {
+
+  // 定义state
+  state = {
+    subjectid:"",
+    title:""
+  }
 
   // 定义默认当前页
   current = 1
@@ -97,10 +84,137 @@ const data = [
     }
   }
 
+  // 新建课程回调
+  handleToAdd = () =>{
+    this.props.history.push('/edu/subject/add')
+  }
+
+  // 点击更新的回调函数
+  handleUpdate = ({_id,title}) => () =>{
+    
+    this.setState({
+      subjectid:_id,
+      title:title
+    })
+
+    this.oldTitle = title
+  }
+
+  // 更新课程分类标题受控组件的事件处理函数
+  handleUpdateChange = (e) =>{
+
+    this.setState({
+      title:e.target.value
+    })
+  }
+
+  // 确认更新
+  handleConfirm = async () =>{
+
+    // 如果输入框为空就不能更新课程
+    if(!this.state.title.trim()){
+      message.warning('请输入有效课程')
+      return
+    }
+
+    // 判断输入的课程跟更新之前的是否一样
+    if(this.state.title === this.oldTitle){
+      message.warning('输入的课程跟更新之前的一样')
+      return
+    }
+
+    // 不能跟已有的一级课程同名
+    // this.props.subjectList.items.find(item =>{
+    //   if(item.title === this.state.title)
+    //   message.warning('不能跟已有的一级课程同名')
+    //   return
+    // })
+
+
+    let id = this.state.subjectid
+    let title = this.state.title
+
+    // // 发请求更新课程分类
+    // await reqUpdateSubject(id,title)
+    // 异步，得加await
+    await this.props.updateSubjectList(id,title)
+    // 提示用户更新成功
+    message.success('更新课程成功')
+
+    // 清空state中数据
+    this.setState({
+      subjectid:"",
+      title:""
+    })
+
+    
+    // 重新请求一级分类课程
+    // this.props.getSubjectList(1,5)
+
+  }
+
+
+  // 取消更新
+  handleCancle = () => {
+    this.setState({
+      subjectid:"",
+      title:""
+    })
+  }
+
   render() {
     console.log(this.props)
+
+    const columns = [
+      { title: '分类名称',  key: 'name' ,
+      render: (record) => {
+        if(this.state.subjectid === record._id){
+         
+          return (<>
+             <Input style={{width:300}} value={this.state.title} onChange={this.handleUpdateChange}></Input>
+          </>)
+        }else{
+
+          return (
+            <>
+              {record.title}
+            </>
+          )
+        }
+      }
+    
+     },
+     
+      {
+        title: '操作',
+        dataIndex: '',
+        key: 'action',
+        render: (record) => {
+          if(this.state.subjectid === record._id){
+
+            return (<>
+              <Button type='primary' size='middle' style={{marginRight:10}} onClick={this.handleConfirm}>确认</Button>
+              <Button type='danger' size='middle' onClick={this.handleCancle}>取消</Button>
+            </>)
+          }
+          return (<>
+            <Tooltip placement="top" title={'更新课程'}>
+                <Button icon={<FormOutlined />} type='primary' style={{marginRight:20,width:40}} onClick={this.handleUpdate(record)}></Button>
+            </Tooltip>
+             
+            <Tooltip placement="top" title={'删除课程'}>
+                <Button icon={<DeleteOutlined />} type='danger' style={{width:40}}></Button>
+            </Tooltip>
+             
+          </>)
+        },
+        width:200,
+      },
+    ];
+
+
     return <div className='subject'>
-      <Button className='subject-btn' type="primary" icon={<PlusOutlined  />}>
+      <Button className='subject-btn' type="primary" icon={<PlusOutlined  />} onClick={this.handleToAdd}>
         新建
       </Button>
 
