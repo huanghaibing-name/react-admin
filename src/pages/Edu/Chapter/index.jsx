@@ -17,18 +17,17 @@ import { connect } from "react-redux";
 import SearchForm from "./SearchForm";
 
 import "./index.less";
+import {getLessonList} from '@pages/Edu/Chapter/redux'
 
 dayjs.extend(relativeTime);
 
 @connect(
   (state) => ({
-    // courseList: state.courseList
-    // permissionValueList: filterPermissions(
-    //   state.course.permissionValueList,
-    //   "Course"
-    // )
-  })
-  // { getcourseList }
+   
+    
+   
+  }),
+  { getLessonList }
 )
 class Chapter extends Component {
   state = {
@@ -90,6 +89,17 @@ class Chapter extends Component {
     });
   };
 
+  // 发请求获取章节
+  handleLesson = (expand,record)=>{
+    // console.log(expand,record)
+
+    if(expand){
+      this.props.getLessonList(record._id)
+    }
+    
+   }
+
+
   render() {
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
@@ -97,6 +107,7 @@ class Chapter extends Component {
       {
         title: "章节名称",
         dataIndex: "title",
+        
       },
       {
         title: "是否免费",
@@ -106,19 +117,26 @@ class Chapter extends Component {
         },
       },
       {
+        title: "视频",
+        dataIndex: "free",
+        render: (free) => {
+          return (free && <Button>预览</Button>)
+        },
+      },
+      {
         title: "操作",
-        width: 300,
+        width: 210,
         fixed: "right",
         render: (data) => {
-          if ("free" in data) {
+        
             return (
               <div>
-                <Tooltip title="查看详情">
-                  <Button>
-                    <SettingOutlined />
+                <Tooltip title="更新章节">
+                  <Button type="primary">
+                    <PlusOutlined />
                   </Button>
                 </Tooltip>
-                <Tooltip title="更新章节">
+                <Tooltip title="查看详情">
                   <Button type="primary" style={{ margin: "0 10px" }}>
                     <FormOutlined />
                   </Button>
@@ -132,7 +150,7 @@ class Chapter extends Component {
             );
           }
         },
-      },
+      
     ];
 
     const data = [
@@ -248,6 +266,7 @@ class Chapter extends Component {
       // ]
     };
 
+    
     return (
       <div>
         <div className="course-search">
@@ -289,9 +308,12 @@ class Chapter extends Component {
           />
           <Table
             rowSelection={rowSelection}
+            expandable={{
+             onExpand:this.handleLesson
+            }}
             columns={columns}
-            dataSource={data}
-            rowKey="id"
+            dataSource={this.props.chapterList}
+            rowKey="_id"
           />
         </div>
 

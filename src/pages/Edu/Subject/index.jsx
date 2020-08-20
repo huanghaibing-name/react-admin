@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import { Button,Table,Tooltip, Input, message } from 'antd';
-import { PlusOutlined ,FormOutlined, DeleteOutlined} from '@ant-design/icons';
+import { Button,Table,Tooltip, Input, message ,Modal} from 'antd';
+import { PlusOutlined ,FormOutlined, DeleteOutlined,ExclamationCircleOutlined} from '@ant-design/icons';
 import './index.less'
 import {connect} from 'react-redux'
-import {getSubjectList,getSecSubjectList,updateSubjectList} from './redux/actions'
+import {getSubjectList,getSecSubjectList,updateSubjectList,deleteSubjectList} from './redux/actions'
 import {reqUpdateSubject} from '@api/edu/subject'
 
 
@@ -41,7 +41,7 @@ const data = [
   },
 ];
 
-@connect(state =>({subjectList:state.subjectList}),{getSubjectList,getSecSubjectList,updateSubjectList})
+@connect(state =>({subjectList:state.subjectList}),{getSubjectList,getSecSubjectList,updateSubjectList,deleteSubjectList})
  class Subject extends Component {
 
   // 定义state
@@ -162,8 +162,33 @@ const data = [
     })
   }
 
+
+  // 删除分类课程
+  handleDel = (record) => () =>{
+    Modal.confirm({
+    title: <div>你确定删除<span style={{color:'#1DA57A',margin:'0 5px'}}>{record.title}</span>嘛?</div>,
+      icon: <ExclamationCircleOutlined />,
+      onOk: async ()=> {
+      await this.props.deleteSubjectList(record._id)
+      message.success('删除课程成功')
+
+      // 删除功能优化
+      if(record.parentId === "0"){
+        if(this.current > 1 && this.props.subjectList.items.length <= 0 && record.parentId === "0"){
+
+          this.props.getSubjectList(--this.current,5)
+        }else{
+          this.props.getSubjectList(1,5)
+        }
+
+        return
+      }     
+    },
+    })   
+  }
+
   render() {
-    console.log(this.props)
+    // console.log(this.props)
 
     const columns = [
       { title: '分类名称',  key: 'name' ,
@@ -203,7 +228,7 @@ const data = [
             </Tooltip>
              
             <Tooltip placement="top" title={'删除课程'}>
-                <Button icon={<DeleteOutlined />} type='danger' style={{width:40}}></Button>
+                <Button icon={<DeleteOutlined />} type='danger' style={{width:40}} onClick={this.handleDel(record)}></Button>
             </Tooltip>
              
           </>)

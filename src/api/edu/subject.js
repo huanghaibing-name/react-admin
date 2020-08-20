@@ -48,4 +48,14 @@ export function reqUpdateSubject(id,title) {
 }
 
 
+// 删除课程分类 请求路径：http://localhost:5000/admin/edu/subject/remove/:id 请求方式：Delete
+export function reqDelSubject(id) {
+  return request({
+    url: `${BASE_URL}/remove/${id}`,
+    method: 'DELETE',
+    
+  });
+}
+
+
 
