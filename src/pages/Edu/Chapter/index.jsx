@@ -24,7 +24,7 @@ dayjs.extend(relativeTime);
 @connect(
   (state) => ({
    
-    
+    chapterList:state.chapterList.chapterList
    
   }),
   { getLessonList }
@@ -100,7 +100,15 @@ class Chapter extends Component {
    }
 
 
+  //  跳转到新增课时页面的回调
+  handleGoAddLesson = data => () =>{
+
+    this.props.history.push('/edu/chapter/addlesson',data)
+  }
+
+
   render() {
+    console.log(this.props)
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
     const columns = [
@@ -131,8 +139,8 @@ class Chapter extends Component {
         
             return (
               <div>
-                <Tooltip title="更新章节">
-                  <Button type="primary">
+                <Tooltip title="新增课时">
+                  <Button type="primary" onClick={this.handleGoAddLesson(data)}>
                     <PlusOutlined />
                   </Button>
                 </Tooltip>

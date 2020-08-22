@@ -18,6 +18,7 @@ export default function chapterList(prevState = initChapterList, action) {
       }
 
       case GET_CHAPTER_LIST:
+        // console.log(action.data.items)
         action.data.items.forEach(item =>{
 
           item.children = []

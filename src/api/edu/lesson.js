@@ -12,3 +12,28 @@ export function reqGetLesson(chapterId) {
    
   });
 }
+
+// 获取七牛云上传凭证  请求路径：http://localhost:5000/uploadtoken 请求方式 ：GET
+export function reqGetUploadToken() {
+  return request({
+    url: `/uploadtoken`,
+    method: "GET",
+   
+  });
+}
+
+
+// 新增课时  请求路径：http://localhost:5000/admin/edu/lesson/save 请求方式：POST
+export function addLesson({chapterId,title,free,video}) {
+  return request({
+    url: `${BASE_URL}/save`,
+    method: "POST",
+    data:{
+      chapterId,
+      title,
+      free,
+      video
+    }
+   
+  });
+}
