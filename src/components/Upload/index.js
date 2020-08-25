@@ -7,6 +7,11 @@ import { nanoid } from 'nanoid'
 
 export default class MyUpload extends Component {
 
+  // 定义状态
+  state={
+    isShow:true
+  }
+
   constructor(){
     super()
     let jsonStr = localStorage.getItem('UPLOAD_TOKEN') 
@@ -85,7 +90,11 @@ export default class MyUpload extends Component {
         console.log("上传成功",res)
         onSuccess()
 
-        this.props.onChange('http://qfejj73v2.hn-bkt.clouddn.com-' + res.key)
+        this.setState({
+          isShow:false
+        })
+
+        this.props.onChange('http://qfejj73v2.hn-bkt.clouddn.com/' + res.key)
       }
     }
 
@@ -113,6 +122,9 @@ export default class MyUpload extends Component {
   // 删除视频时触发
   handleRemove = () =>{
     this.props.onChange('')
+    this.setState({
+      isShow:true
+    })
   }
 
   render() {
@@ -121,10 +133,12 @@ export default class MyUpload extends Component {
       beforeUpload={this.handleBeforeUpload}
       customRequest={this.customRequest}
       onRemove={this.handleRemove}
+      // 表示在前端只能选择视频
+      accept="video/*"
       >
-        <Button>
+        {this.state.isShow && <Button>
           <UploadOutlined /> Upload
-        </Button>
+        </Button>}
       </Upload>
     )
   }

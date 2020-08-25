@@ -21,16 +21,18 @@ import { findPathIndex } from "@utils/tools";
 // 引入组件公共样式
 import "@assets/css/common.less";
 import "./index.less";
-
+import {setIntl} from "@redux/actions/intl"
 const { Header, Sider, Content } = Layout;
 
 @connect(
   (state) => ({
     user: state.user,
+    intl:state.intl
   }),
   {
     logout,
     resetUser,
+    setIntl
   }
 )
 @withRouter
@@ -131,6 +133,11 @@ class PrimaryLayout extends Component {
     );
   };
 
+  // 国际化点击事件
+  handleMenuClick = (options)=>{
+    this.props.setIntl(options.key)
+  }
+
   render() {
     const { collapsed } = this.state;
     const {
@@ -140,6 +147,22 @@ class PrimaryLayout extends Component {
     } = this.props;
 
     const route = this.selectRoute(routes, pathname);
+
+    const menu = (
+      <Menu selectedKeys={[this.props.intl]} onClick={this.handleMenuClick} placement="bottomCenter">
+        <Menu.Item key="zh" >
+          <a>
+            中文
+          </a>
+        </Menu.Item>
+
+        <Menu.Item key="en" >
+          <a >
+            English
+          </a>
+        </Menu.Item>
+      </Menu>
+    )
 
     return (
       <Layout className="layout">
@@ -170,7 +193,12 @@ class PrimaryLayout extends Component {
                   </span>
                 </Dropdown>
                 <span className="site-layout-lang">
+                
+                {/* 全球化 */}
+                <Dropdown overlay={menu}>
                   <GlobalOutlined />
+                </Dropdown>
+
                 </span>
               </span>
             </span>

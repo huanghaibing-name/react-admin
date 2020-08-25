@@ -1,0 +1,17 @@
+{
+  "title":"标题",
+  "courseTitle":"课程标题",
+  "teacher":"讲师",
+  "courseTeacher":"课程讲师",
+  "sort":"分类",
+  "courseSort":"课程分类",
+  "query":"查询",
+  "reset":"重置",
+  "courseDataList":"课程数据列表",
+  "number":"序号",
+  "courseDescribe":"课程描述",
+  "courseImages":"课程图片",
+  "coursePrice":"课程价格",
+  "belongTOSort":"所属课程分类",
+  "operate":"操作"
+}

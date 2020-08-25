@@ -17,7 +17,12 @@ import { connect } from "react-redux";
 import SearchForm from "./SearchForm";
 
 import "./index.less";
-import {getLessonList} from '@pages/Edu/Chapter/redux'
+import {getLessonList,batchRemoveChapterList,batchRemoveLessonList} from '@pages/Edu/Chapter/redux'
+//1、安装 2、导入知乎视频播放
+import Player from 'griffith'
+//2. 导入
+import screenfull from 'screenfull'
+
 
 dayjs.extend(relativeTime);
 
@@ -27,7 +32,7 @@ dayjs.extend(relativeTime);
     chapterList:state.chapterList.chapterList
    
   }),
-  { getLessonList }
+  { getLessonList,batchRemoveChapterList,batchRemoveLessonList }
 )
 class Chapter extends Component {
   state = {
@@ -35,6 +40,7 @@ class Chapter extends Component {
     previewVisible: false,
     previewImage: "",
     selectedRowKeys: [],
+    play_url:"",
   };
 
   showImgModal = (img) => {
@@ -106,9 +112,59 @@ class Chapter extends Component {
     this.props.history.push('/edu/chapter/addlesson',data)
   }
 
+  // 预览视频
+  handlePreviewVideo = record => () =>{
+    console.log(record)
+    this.setState({
+      previewVisible: true,
+      play_url:record.video
+    })
+  }
+
+  // 批量删除回调
+  handleBatchRemove = async () =>{
+
+    // 1、拿到所有章节数据并遍历
+    //获取章节id
+    const chapterIdList = []
+    this.props.chapterList.forEach(item =>{
+
+      if(this.state.selectedRowKeys.indexOf(item._id) > -1){
+
+        chapterIdList.push(item._id)
+      }
+    })
+
+    // 获取课时id
+    // const lessonIdList = []
+    // this.state.selectedRowKeys.forEach(item =>{
+
+    //   if(chapterIdList.indexOf(item) === -1){
+
+    //     lessonIdList.push(item)
+    //   }
+    // })
+    const lessonIdList = this.state.selectedRowKeys.filter(item => chapterIdList.indexOf(item) === -1)
+    
+    // console.log('章节id',chapterIdList)
+    // console.log('课时id',lessonIdList)
+
+      await this.props.batchRemoveChapterList(chapterIdList)
+      await this.props.batchRemoveLessonList(lessonIdList)
+
+      message.success('删除成功')
+  }
+
+
+  // 全屏显示
+  handleScreenfull = ()=> {
+    // screenfull.request()
+    screenfull.toggle() // 点击全屏按钮,可以展开也可以关闭
+  }
+
 
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     const { previewVisible, previewImage, selectedRowKeys } = this.state;
 
     const columns = [
@@ -126,9 +182,9 @@ class Chapter extends Component {
       },
       {
         title: "视频",
-        dataIndex: "free",
-        render: (free) => {
-          return (free && <Button>预览</Button>)
+        // dataIndex: "free",
+        render: (record) => {
+          return (record.free && <Button onClick={this.handlePreviewVideo(record)}>预览</Button>)
         },
       },
       {
@@ -274,7 +330,23 @@ class Chapter extends Component {
       // ]
     };
 
-    
+    // 3、定义source,为了视频播放
+  const sources = {
+    hd: {
+      // play_url: 'https://zhstatic.zhihu.com/cfe/griffith/zhihu2018_hd.mp4',
+      play_url:this.state.play_url,
+      bitrate: 1,
+      duration: 1000,
+      format: '',
+      height: 500,
+      size: 160000,
+      width: 500
+    },
+  
+  }
+
+
+ 
     return (
       <div>
         <div className="course-search">
@@ -288,10 +360,10 @@ class Chapter extends Component {
                 <PlusOutlined />
                 <span>新增</span>
               </Button>
-              <Button type="danger" style={{ marginRight: 10 }}>
+              <Button type="danger" style={{ marginRight: 10 }} onClick={this.handleBatchRemove}>
                 <span>批量删除</span>
               </Button>
-              <Tooltip title="全屏" className="course-table-btn">
+              <Tooltip title="全屏" className="course-table-btn" onClick={this.handleScreenfull}>
                 <FullscreenOutlined />
               </Tooltip>
               <Tooltip title="刷新" className="course-table-btn">
@@ -329,8 +401,23 @@ class Chapter extends Component {
           visible={previewVisible}
           footer={null}
           onCancel={this.handleImgModal}
+          // 解决取消按钮挡住问题
+          title='预览课时视频'
+          // 解决视频关掉还在播放问题
+          destroyOnClose={true}
+          width={500}
         >
-          <img alt="example" style={{ width: "100%" }} src={previewImage} />
+         {/* 4、使用player组件 */}
+         <Player 
+         sources={sources} 
+         // 解决id报错问题 id必须是字符串
+         id={'1'}
+        //  解决cove报错问题
+        cover={'http://localhost:3000/logo512.png'}
+        // 解决duration报错问题
+        duration={1000}
+      
+         />
         </Modal>
       </div>
     );

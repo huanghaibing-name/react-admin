@@ -58,4 +58,23 @@ export function reqDelSubject(id) {
 }
 
 
+// 获取所有一级课程分类数据 请求路径：http://localhost:5000/admin/edu/subject 请求方式：GET
+export function reqGetAllSubjectList() {
+  return request({
+    url: `${BASE_URL}`,
+    method: 'GET',
+    
+  });
+}
+
+
+// 获取所有二级课程分类数据 请求数据：http://localhost:5000/admin/edu/subject/get/:parentId 请求方式：GET
+export function reqGetAllSecSubjectList(parentId) {
+  return request({
+    url: `${BASE_URL}/get/${parentId}`,
+    method: 'GET',
+    
+  });
+}
+
 

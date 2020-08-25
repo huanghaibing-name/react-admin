@@ -33,7 +33,17 @@ export function addLesson({chapterId,title,free,video}) {
       title,
       free,
       video
-    }
-   
+    }   
+  });
+}
+
+// 批量删除多个课时 请求路径：http://localhost:5000/admin/edu/lesson/batchRemove 请求方式：DELETE
+export function reqBatchRemoveLessonList(idList) {
+  return request({
+    url: `${BASE_URL}/batchRemove`,
+    method: "DELETE",
+    data:{
+      idList
+    }   
   });
 }
